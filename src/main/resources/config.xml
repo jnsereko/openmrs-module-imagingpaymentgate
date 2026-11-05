@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN"
+    "https://resources.openmrs.org/doctype/config-1.6.dtd">
+
+<module configVersion="1.6">
+    <id>imagingpaymentgate</id>
+    <name>Imaging Payment Gate</name>
+    <version>${project.version}</version>
+    <package>org.openmrs.module.imagingpaymentgate</package>
+    <author>UVL-EMR Team</author>
+    <description>
+        Refuses results on an imaging order whose payment is not confirmed, whichever client
+        saves them (UVL-EMR#322).
+    </description>
+
+    <activator>org.openmrs.module.imagingpaymentgate.ImagingPaymentGateActivator</activator>
+
+    <require_version>2.7.6</require_version>
+
+    <!--
+      The service-level checks. They run before anything is written, so a refusal reaches the
+      client as HTTP 402 with the message. ImagingPaymentGateInterceptor (moduleApplicationContext.xml)
+      is the backstop for writes that do not go through these services, such as FHIR Observation.
+    -->
+    <advice>
+        <point>org.openmrs.api.ObsService</point>
+        <class>org.openmrs.module.imagingpaymentgate.ImagingPaymentGateAdvice</class>
+    </advice>
+    <advice>
+        <point>org.openmrs.api.EncounterService</point>
+        <class>org.openmrs.module.imagingpaymentgate.ImagingPaymentGateAdvice</class>
+    </advice>
+    <advice>
+        <point>org.openmrs.api.OrderService</point>
+        <class>org.openmrs.module.imagingpaymentgate.ImagingPaymentGateAdvice</class>
+    </advice>
+
+    <privilege>
+        <name>Bypass Imaging Payment Gate</name>
+        <description>
+            Save results on an imaging order whose payment is not confirmed. For emergencies only;
+            every use is logged.
+        </description>
+    </privilege>
+
+    <globalProperty>
+        <property>imagingpaymentgate.enabled</property>
+        <defaultValue>true</defaultValue>
+        <description>
+            true to refuse results on an unpaid imaging order; false turns the gate off.
+        </description>
+    </globalProperty>
+    <globalProperty>
+        <property>imagingpaymentgate.conceptSetUuids</property>
+        <defaultValue></defaultValue>
+        <description>
+            Comma-separated uuids of concept sets whose members are imaging procedures. An order
+            for any member is gated. Use the same set the EIP bridges read
+            (RADIOLOGY_CONCEPT_SET_UUID), so the gate never holds an order the bridge cannot mark paid.
+        </description>
+    </globalProperty>
+    <globalProperty>
+        <property>imagingpaymentgate.conceptUuids</property>
+        <defaultValue></defaultValue>
+        <description>
+            Comma-separated uuids of individual order concepts that are gated, in addition to the sets.
+        </description>
+    </globalProperty>
+    <globalProperty>
+        <property>imagingpaymentgate.orderTypeUuids</property>
+        <defaultValue></defaultValue>
+        <description>
+            Comma-separated uuids of order types whose orders are all gated, whatever their concept.
+        </description>
+    </globalProperty>
+</module>
