@@ -28,6 +28,18 @@ client saves them: the chart's "Entrer des résultats", the Laboratory app, REST
 - A Hibernate interceptor on Obs inserts (moduleApplicationContext.xml): the backstop for writes that
   bypass the services, such as a FHIR Observation with `basedOn`.
 
+## Admitted patients' visits stay open (UVL-EMR#246)
+
+Core's Auto Close Visits Task calls `VisitService.stopVisits(Date)`, which closes every open visit
+of a type in `visits.autoCloseVisitType`, admitted patients included. An around-advice on
+`VisitService` (`KeepAdmittedVisitsOpenAdvice`) replaces that one method with the same loop (core's
+`VisitDAO.getNextVisit` / `saveVisit`, one stop time per run, flush every 50) that skips a visit
+whose latest non-voided Admission or Discharge encounter is an Admission. Transfers do not change
+that. The encounter types are emrapi's metadata mappings `emr.admissionEncounterType` and
+`emr.exitFromInpatientEncounterType`, the ones the ward app writes; with no admission type mapped the
+run is core's, with a WARN. The task, its class and its start time are core's (#350 sets 21:59:59
+UTC). `imagingpaymentgate.keepAdmittedVisitsOpen=false` gives core's behaviour back.
+
 ## Build
 
     mvn clean package   # target/imagingpaymentgate-<version>.omod

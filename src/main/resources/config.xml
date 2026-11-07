@@ -35,6 +35,16 @@
         <class>org.openmrs.module.imagingpaymentgate.ImagingPaymentGateAdvice</class>
     </advice>
 
+    <!--
+      Core's Auto Close Visits Task calls VisitService.stopVisits(Date). This replaces that one method
+      with the same loop minus the visits of admitted, not yet discharged patients, so a stay on any
+      visit type survives the nightly close (UVL-EMR#246). The task and its time are core's.
+    -->
+    <advice>
+        <point>org.openmrs.api.VisitService</point>
+        <class>org.openmrs.module.imagingpaymentgate.KeepAdmittedVisitsOpenAdvice</class>
+    </advice>
+
     <privilege>
         <name>Bypass Imaging Payment Gate</name>
         <description>
@@ -48,6 +58,16 @@
         <defaultValue>true</defaultValue>
         <description>
             true to refuse results on an unpaid imaging order; false turns the gate off.
+        </description>
+    </globalProperty>
+    <globalProperty>
+        <property>imagingpaymentgate.keepAdmittedVisitsOpen</property>
+        <defaultValue>true</defaultValue>
+        <description>
+            true: the nightly Auto Close Visits Task leaves open the visit of a patient whose latest
+            Admission or Discharge encounter is an Admission (emrapi's emr.admissionEncounterType and
+            emr.exitFromInpatientEncounterType), so the stay can be counted. Other visits close as
+            before. false: core closes every visit of the auto-close types, admitted or not.
         </description>
     </globalProperty>
     <globalProperty>

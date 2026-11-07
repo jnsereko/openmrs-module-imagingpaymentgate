@@ -67,7 +67,12 @@ public class JdbcGateStore implements GateStore {
 
 	/** The current OpenMRS Hibernate session's connection. */
 	public static JdbcGateStore onCurrentSession() {
-		return new JdbcGateStore(new JdbcRunner() {
+		return new JdbcGateStore(currentSession());
+	}
+
+	/** Runs on the current OpenMRS Hibernate session's connection. */
+	static JdbcRunner currentSession() {
+		return new JdbcRunner() {
 
 			@Override
 			public <T> T run(final ConnectionWork<T> work) {
@@ -81,7 +86,7 @@ public class JdbcGateStore implements GateStore {
 					}
 				});
 			}
-		});
+		};
 	}
 
 	@Override
