@@ -17,6 +17,9 @@ public final class ImagingPaymentGateConstants {
 
 	public static final String GP_ORDER_TYPE_UUIDS = "imagingpaymentgate.orderTypeUuids";
 
+	/** false lets core's nightly visit closing close admitted patients' visits too (UVL-EMR#246). */
+	public static final String GP_KEEP_ADMITTED_VISITS_OPEN = "imagingpaymentgate.keepAdmittedVisitsOpen";
+
 	/** Lets a user save results on an unpaid imaging order. Superusers hold every privilege, so they have it too. */
 	public static final String PRIV_BYPASS = "Bypass Imaging Payment Gate";
 
