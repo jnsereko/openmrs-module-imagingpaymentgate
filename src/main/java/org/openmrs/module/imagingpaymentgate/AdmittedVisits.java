@@ -6,6 +6,7 @@
  */
 package org.openmrs.module.imagingpaymentgate;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -94,11 +95,17 @@ public class AdmittedVisits {
 	 * are ordered by id, so the one saved last wins.
 	 */
 	static boolean isAdmitted(Visit visit, Set<String> admissionTypes, Set<String> dischargeTypes) {
-		if (admissionTypes.isEmpty() || visit.getEncounters() == null) {
+		return isAdmitted(visit.getEncounters(), admissionTypes, dischargeTypes);
+	}
+
+	/** {@link #isAdmitted(Visit, Set, Set)} over the given encounters of one visit. */
+	static boolean isAdmitted(Collection<Encounter> encounters, Set<String> admissionTypes,
+	        Set<String> dischargeTypes) {
+		if (admissionTypes.isEmpty() || encounters == null) {
 			return false;
 		}
 		Encounter latest = null;
-		for (Encounter encounter : visit.getEncounters()) {
+		for (Encounter encounter : encounters) {
 			if (Boolean.TRUE.equals(encounter.getVoided()) || encounter.getEncounterType() == null
 			        || encounter.getEncounterDatetime() == null) {
 				continue;
