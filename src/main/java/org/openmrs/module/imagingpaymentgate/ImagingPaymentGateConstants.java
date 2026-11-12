@@ -20,6 +20,9 @@ public final class ImagingPaymentGateConstants {
 	/** false lets core's nightly visit closing close admitted patients' visits too (UVL-EMR#246). */
 	public static final String GP_KEEP_ADMITTED_VISITS_OPEN = "imagingpaymentgate.keepAdmittedVisitsOpen";
 
+	/** false leaves a discharged patient's visit open, as core does (UVL-EMR#608). */
+	public static final String GP_END_VISIT_AT_DISCHARGE = "imagingpaymentgate.endVisitAtDischarge";
+
 	/** Lets a user save results on an unpaid imaging order. Superusers hold every privilege, so they have it too. */
 	public static final String PRIV_BYPASS = "Bypass Imaging Payment Gate";
 

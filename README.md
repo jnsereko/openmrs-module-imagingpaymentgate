@@ -40,6 +40,19 @@ that. The encounter types are emrapi's metadata mappings `emr.admissionEncounter
 run is core's, with a WARN. The task, its class and its start time are core's (#350 sets 21:59:59
 UTC). `imagingpaymentgate.keepAdmittedVisitsOpen=false` gives core's behaviour back.
 
+## A discharge ends the visit (UVL-EMR#608)
+
+The ward app discharges with a Discharge encounter on the visit and leaves the visit open, and the
+Inpatient visit type is not auto-closed (adding it would close admitted patients' visits every
+night). The patient kept an active visit, so later orders, at the outpatient department included,
+went on it. An after-returning advice on `EncounterService.saveEncounter`
+(`EndVisitAtDischargeAdvice`) ends the visit when the saved encounter is a non-voided Discharge
+(`emr.exitFromInpatientEncounterType`) on an open visit with no later Admission. The stop time is the
+discharge time, or the visit's latest encounter if that is later. It runs in the save's transaction
+and saves the visit through core's `VisitDAO`, like the nightly close. Any visit type. The Discharge
+Summary form's encounter is not a Discharge and ends nothing.
+`imagingpaymentgate.endVisitAtDischarge=false` leaves the visit open, as core does.
+
 ## Build
 
     mvn clean package   # target/imagingpaymentgate-<version>.omod

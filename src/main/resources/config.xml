@@ -45,6 +45,16 @@
         <class>org.openmrs.module.imagingpaymentgate.KeepAdmittedVisitsOpenAdvice</class>
     </advice>
 
+    <!--
+      The ward app discharges with a Discharge encounter and leaves the visit open; the Inpatient visit
+      type is not auto-closed. This ends the visit at the discharge, inside the same save, so the next
+      order goes on a new visit (UVL-EMR#608).
+    -->
+    <advice>
+        <point>org.openmrs.api.EncounterService</point>
+        <class>org.openmrs.module.imagingpaymentgate.EndVisitAtDischargeAdvice</class>
+    </advice>
+
     <privilege>
         <name>Bypass Imaging Payment Gate</name>
         <description>
@@ -68,6 +78,15 @@
             Admission or Discharge encounter is an Admission (emrapi's emr.admissionEncounterType and
             emr.exitFromInpatientEncounterType), so the stay can be counted. Other visits close as
             before. false: core closes every visit of the auto-close types, admitted or not.
+        </description>
+    </globalProperty>
+    <globalProperty>
+        <property>imagingpaymentgate.endVisitAtDischarge</property>
+        <defaultValue>true</defaultValue>
+        <description>
+            true: saving a Discharge encounter (emrapi's emr.exitFromInpatientEncounterType) on an open
+            visit ends the visit at the discharge time (or at its latest encounter, if later), unless a
+            later Admission is on the visit. false: the visit stays open, as in core.
         </description>
     </globalProperty>
     <globalProperty>

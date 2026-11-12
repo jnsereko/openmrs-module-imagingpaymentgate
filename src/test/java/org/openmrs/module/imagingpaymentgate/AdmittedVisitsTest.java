@@ -247,9 +247,11 @@ public class AdmittedVisitsTest {
 	}
 
 	/** Core's getNextVisit over an in-memory list: the next open visit by id. */
-	private static class FakeStore implements VisitCloseStore {
+	static class FakeStore implements VisitCloseStore {
 
 		boolean enabled = true;
+
+		boolean endAtDischarge = true;
 
 		final List<VisitType> types = new ArrayList<VisitType>();
 
@@ -264,6 +266,11 @@ public class AdmittedVisitsTest {
 		@Override
 		public boolean isKeepAdmittedVisitsOpen() {
 			return enabled;
+		}
+
+		@Override
+		public boolean isEndVisitAtDischarge() {
+			return endAtDischarge;
 		}
 
 		@Override

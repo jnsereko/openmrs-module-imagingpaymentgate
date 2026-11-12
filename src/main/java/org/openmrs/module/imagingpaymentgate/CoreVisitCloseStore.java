@@ -58,6 +58,12 @@ public class CoreVisitCloseStore implements VisitCloseStore {
 		        .getGlobalProperty(ImagingPaymentGateConstants.GP_KEEP_ADMITTED_VISITS_OPEN));
 	}
 
+	@Override
+	public boolean isEndVisitAtDischarge() {
+		return GateConfig.parseEnabled(Context.getAdministrationService()
+		        .getGlobalProperty(ImagingPaymentGateConstants.GP_END_VISIT_AT_DISCHARGE));
+	}
+
 	/** Core's VisitServiceImpl.getVisitTypesToStop: names, trimmed and case-insensitive. */
 	@Override
 	public List<VisitType> getVisitTypesToStop() {

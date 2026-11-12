@@ -14,11 +14,14 @@ import java.util.Set;
 import org.openmrs.Visit;
 import org.openmrs.VisitType;
 
-/** What {@link AdmittedVisits} reads and writes; {@link CoreVisitCloseStore} is the OpenMRS one. */
+/** What {@link AdmittedVisits} and {@link DischargedVisits} read and write; {@link CoreVisitCloseStore} is the OpenMRS one. */
 public interface VisitCloseStore {
 
 	/** {@code imagingpaymentgate.keepAdmittedVisitsOpen}; missing or blank means true. */
 	boolean isKeepAdmittedVisitsOpen();
+
+	/** {@code imagingpaymentgate.endVisitAtDischarge}; missing or blank means true. */
+	boolean isEndVisitAtDischarge();
 
 	/** The visit types named in {@code visits.autoCloseVisitType}, matched as core matches them. */
 	List<VisitType> getVisitTypesToStop();
