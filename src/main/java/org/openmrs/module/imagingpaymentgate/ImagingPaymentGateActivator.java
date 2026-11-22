@@ -26,4 +26,14 @@ public class ImagingPaymentGateActivator extends BaseModuleActivator {
 			log.error("Imaging Payment Gate started but could not read its configuration yet", e);
 		}
 	}
+	
+	/**
+	 * Runs after the context refresh that follows every module start, on the refreshing thread and
+	 * with all modules' services available, so billing's generator is loaded before the first order
+	 * is billed (UVL-EMR#846). Repeats are cheap: a loaded generator is returned as it is.
+	 */
+	@Override
+	public void contextRefreshed() {
+		ReceiptNumberGeneratorWarmUp.run();
+	}
 }

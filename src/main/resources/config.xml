@@ -18,6 +18,15 @@
     <require_version>2.7.6</require_version>
 
     <!--
+      Soft only: no require_modules. aware_of_modules starts billing first when it is present, so
+      ReceiptNumberGeneratorWarmUp (UVL-EMR#846) finds it; without billing this module starts and
+      the warm-up logs that and does nothing.
+    -->
+    <aware_of_modules>
+        <aware_of_module>org.openmrs.module.billing</aware_of_module>
+    </aware_of_modules>
+
+    <!--
       The service-level checks. They run before anything is written, so a refusal reaches the
       client as HTTP 402 with the message. ImagingPaymentGateInterceptor (moduleApplicationContext.xml)
       is the backstop for writes that do not go through these services, such as FHIR Observation.
