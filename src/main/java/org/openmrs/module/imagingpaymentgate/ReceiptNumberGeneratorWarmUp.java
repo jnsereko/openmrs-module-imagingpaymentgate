@@ -28,7 +28,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Billing is reached by reflection through its own class loader: there is no compile or
  * {@code require_modules} dependency, so this module starts, and does nothing, where billing is
- * absent. It never throws: a failed warm-up leaves the generator to its first use, as before.
+ * absent. Every outcome is logged at WARN, prefixed "(information)", because deployments set
+ * {@code org.openmrs} to WARN and an operator must see after each start that the warm-up ran (the
+ * gate's bypass is logged at WARN for the same reason). It never throws: a failed warm-up leaves the generator to its first use, as before.
  */
 public final class ReceiptNumberGeneratorWarmUp {
 	
@@ -46,13 +48,13 @@ public final class ReceiptNumberGeneratorWarmUp {
 		try {
 			Module billing = ModuleFactory.getStartedModuleById(BILLING_MODULE_ID);
 			if (billing == null) {
-				log.info("Receipt number generator not warmed: the billing module is not started");
+				log.warn("(information) Receipt number generator not warmed: the billing module is not started");
 				return;
 			}
 			warm(ModuleFactory.getModuleClassLoader(billing));
 		}
 		catch (RuntimeException | LinkageError e) {
-			log.warn("Receipt number generator not warmed", e);
+			log.warn("(information) Receipt number generator not warmed", e);
 		}
 	}
 	
@@ -65,27 +67,27 @@ public final class ReceiptNumberGeneratorWarmUp {
 			Class<?> factory = Class.forName(FACTORY_CLASS, true, billingClassLoader);
 			Object generator = factory.getMethod("getGenerator").invoke(null);
 			if (generator == null) {
-				log.warn("Receipt number generator not warmed: billing.systemReceiptNumberGenerator is not set");
+				log.warn("(information) Receipt number generator not warmed: billing.systemReceiptNumberGenerator is not set");
 				return false;
 			}
 			Method isLoaded = generator.getClass().getMethod("isLoaded");
 			boolean loaded = Boolean.TRUE.equals(isLoaded.invoke(generator));
 			if (loaded) {
-				log.info("Receipt number generator warmed at start-up: {} loaded (UVL-EMR#846)",
+				log.warn("(information) Receipt number generator warmed at start-up: {} loaded (UVL-EMR#846)",
 				    generator.getClass().getName());
 			} else {
-				log.warn("Receipt number generator not warmed: {} is not loaded", generator.getClass().getName());
+				log.warn("(information) Receipt number generator not warmed: {} is not loaded", generator.getClass().getName());
 			}
 			return loaded;
 		}
 		catch (ClassNotFoundException e) {
-			log.info("Receipt number generator not warmed: no billing factory class ({})", e.getMessage());
+			log.warn("(information) Receipt number generator not warmed: no billing factory class ({})", e.getMessage());
 		}
 		catch (InvocationTargetException e) {
-			log.warn("Receipt number generator not warmed: getGenerator() failed", e.getCause());
+			log.warn("(information) Receipt number generator not warmed: getGenerator() failed", e.getCause());
 		}
 		catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
-			log.warn("Receipt number generator not warmed", e);
+			log.warn("(information) Receipt number generator not warmed", e);
 		}
 		return false;
 	}
